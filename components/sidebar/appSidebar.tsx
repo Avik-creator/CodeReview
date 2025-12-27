@@ -33,11 +33,16 @@ const AppSidebar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
+  useEffect(() => {
+    setMounted(true);
+  });
+
   const isActive = (url: string) => {
     return pathname === url || pathname.startsWith(url + '/dashboard');
   };
 
   if (!mounted || !session) return null;
+
   const user = session.user;
   const userName = user.name || 'GUEST';
   const userEmail = user.email || '';
@@ -126,7 +131,7 @@ const AppSidebar = () => {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-64 rounded-xl p-2"
+                className="w-64 rounded-xl p-2 transition-colors"
                 align="end"
                 side="right"
                 sideOffset={8}
