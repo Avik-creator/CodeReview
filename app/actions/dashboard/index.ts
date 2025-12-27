@@ -160,3 +160,25 @@ export async function getMonthlyActivity() {
     return [];
   }
 }
+
+export async function getContributionStats() {
+  try {
+    const { token, octokit } = await getCurrentSession();
+    const { data: user } = await octokit.rest.users.getAuthenticated();
+    const calendar = await fetchUserContribution(token, user.login!);
+    if (!calendar) {
+      return null;
+    }
+    const contributions = calendar.weeks.flatMap((week: ContributionWeek) =>
+      week.contributionDays.map((day: ContributionDay) => ({
+        date: day.date,
+        count: day.contributionCount,
+        level: Math.min(4, Math.floor(day.contributionCount / 3)),
+      }))
+    );
+    return contributions;
+  } catch (error) {
+    console.error("Error fetching contribution stats:", error);
+    return null;
+  }
+}
