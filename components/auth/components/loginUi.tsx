@@ -2,6 +2,7 @@ import { GithubSignInButton } from '@/components/auth/components/login/githubSig
 import { CodePattern } from '@/components/auth/components/login/codePattern';
 import Image from 'next/image';
 import Logo from '@/public/logo.png';
+import Link from 'next/link';
 export default function LoginUI() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
@@ -52,13 +53,13 @@ export default function LoginUI() {
 
           <p className="text-xs text-center text-muted-foreground mt-6 leading-relaxed">
             By continuing, you agree to the{' '}
-            <a href="#" className="text-primary hover:underline">
+            <Link href="/terms" className="text-primary hover:underline">
               Terms of Use
-            </a>{' '}
+            </Link>{' '}
             and{' '}
-            <a href="#" className="text-primary hover:underline">
+            <Link href="/privacy" className="text-primary hover:underline">
               Privacy Policy
-            </a>{' '}
+            </Link>{' '}
             applicable to CodeReviewer
           </p>
         </div>
