@@ -9,10 +9,17 @@ export default function LoginUI() {
       {/* Left Side - Hero Section */}
       <div className="flex-1 relative flex flex-col justify-between p-8 lg:p-16 overflow-hidden">
         {/* Logo */}
-        <div className="flex items-center gap-3 z-10">
-          <Image src={Logo} alt={'CodeReviewer Logo'} width={50} height={50} />
-          <span className="text-2xl font-bold">CodeReviewer</span>
-        </div>
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex items-center gap-3 z-10">
+            <Image
+              src={Logo}
+              alt={'CodeReviewer Logo'}
+              width={50}
+              height={50}
+            />
+            <span className="text-2xl font-bold">CodeReviewer</span>
+          </div>
+        </Link>
 
         {/* Hero Content */}
         <div className="z-10 max-w-2xl">

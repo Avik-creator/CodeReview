@@ -11,8 +11,11 @@ export function GithubSignInButton() {
     try {
       await signIn.social({
         provider: 'github',
+        callbackURL: '/dashboard',
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error('Failed to Login');
+    }
   };
 
   return (
