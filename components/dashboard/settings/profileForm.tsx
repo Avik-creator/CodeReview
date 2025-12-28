@@ -13,15 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserProfile, updateUserProfile } from "@/app/actions/settings";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { Calendar, Mail, Save, User } from "lucide-react";
+import { Calendar, Mail, Save, User, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, getInitials } from "@/lib/utils";
 
 export const ProfileForm = () => {
-  const queryClient = useQueryClient();
-
   const { data: profileData, isLoading } = useQuery({
     queryKey: ["userProfile"],
     queryFn: async () => await getUserProfile(),
@@ -29,19 +28,82 @@ export const ProfileForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Initialize state directly from profileData - React Query handles the updates
+  const formKey = useMemo(() => {
+    return profileData ? `${profileData.name}-${profileData.email}` : "initial";
+  }, [profileData?.name, profileData?.email]);
+
+  if (isLoading) {
+    return <ProfileFormSkeleton />;
+  }
+
+  return <ProfileFormInner key={formKey} profileData={profileData} />;
+};
+
+// Loading skeleton component
+const ProfileFormSkeleton = () => {
+  return (
+    <div className="space-y-4 md:space-y-6">
+      {/* Profile Header Skeleton */}
+      <Card className="border-border/50 bg-linear-to-br from-card to-card/50">
+        <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <Skeleton className="h-16 w-16 sm:h-20 sm:w-20 rounded-full shrink-0" />
+            <div className="flex-1 text-center sm:text-left w-full space-y-2">
+              <Skeleton className="h-7 sm:h-8 w-48 mx-auto sm:mx-0" />
+              <Skeleton className="h-5 w-64 mx-auto sm:mx-0" />
+              <Skeleton className="h-4 w-40 mx-auto sm:mx-0" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Form Skeleton */}
+      <Card className="border-border/50">
+        <CardHeader className="p-4 sm:p-6">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64 mt-2" />
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 border-t border-border">
+              <Skeleton className="h-10 w-full sm:w-32" />
+              <Skeleton className="h-10 w-full sm:w-24" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Separate component that remounts with fresh data
+const ProfileFormInner = ({
+  profileData,
+}: {
+  profileData?: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    createdAt: Date | string;
+    updatedAt: Date | string;
+  };
+}) => {
+  const queryClient = useQueryClient();
+
+  // Initialize state from props - this only runs once per mount
   const [name, setName] = useState(profileData?.name ?? "");
   const [email, setEmail] = useState(profileData?.email ?? "");
-
-  // Update local state when profileData changes, but only if it's actually different
-  // This prevents unnecessary re-renders
-  if (
-    profileData &&
-    (name !== (profileData.name ?? "") || email !== (profileData.email ?? ""))
-  ) {
-    setName(profileData.name ?? "");
-    setEmail(profileData.email ?? "");
-  }
 
   const updateMutation = useMutation({
     mutationFn: async (data: { name: string; email: string }) =>
@@ -63,6 +125,9 @@ export const ProfileForm = () => {
     e.preventDefault();
     updateMutation.mutate({ name, email });
   };
+
+  const isFormChanged =
+    name !== (profileData?.name ?? "") || email !== (profileData?.email ?? "");
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -128,6 +193,7 @@ export const ProfileForm = () => {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
                     className="pl-10 bg-background border-border focus:border-primary focus:ring-primary/20 text-sm sm:text-base"
+                    disabled={updateMutation.isPending}
                     required
                   />
                 </div>
@@ -150,6 +216,7 @@ export const ProfileForm = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.email@example.com"
                     className="pl-10 bg-background border-border focus:border-primary focus:ring-primary/20 text-sm sm:text-base"
+                    disabled={updateMutation.isPending}
                     required
                   />
                 </div>
@@ -159,12 +226,12 @@ export const ProfileForm = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 pt-4 border-t border-border">
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md hover:shadow-lg transition-all w-full sm:w-auto text-sm sm:text-base"
+                disabled={updateMutation.isPending || !isFormChanged}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-md hover:shadow-lg transition-all w-full sm:w-auto text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? (
+                {updateMutation.isPending ? (
                   <>
-                    <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Saving...
                   </>
                 ) : (
@@ -181,12 +248,18 @@ export const ProfileForm = () => {
                   setName(profileData?.name || "");
                   setEmail(profileData?.email || "");
                 }}
-                disabled={isLoading}
-                className="border-border hover:bg-muted w-full sm:w-auto text-sm sm:text-base"
+                disabled={updateMutation.isPending || !isFormChanged}
+                className="border-border hover:bg-muted w-full sm:w-auto text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Reset
               </Button>
             </div>
+
+            {isFormChanged && !updateMutation.isPending && (
+              <p className="text-xs text-muted-foreground text-center sm:text-left">
+                You have unsaved changes
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
