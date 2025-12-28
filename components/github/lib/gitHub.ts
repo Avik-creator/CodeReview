@@ -75,3 +75,26 @@ export async function fetchUserContribution(token: string, username: string) {
     });
   }
 }
+
+export const getRepositories = async (
+  page: number = 1,
+  perPage: number = 10
+) => {
+  try {
+    const token = await getGitHubToken();
+    const octokit = new Octokit({ auth: token });
+
+    const response = await octokit.rest.repos.listForAuthenticatedUser({
+      sort: "updated",
+      direction: "desc",
+      visibility: "all",
+      per_page: perPage,
+      page: page,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching repositories:", error);
+    return [];
+  }
+};
