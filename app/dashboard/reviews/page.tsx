@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { getReviews } from "@/app/actions/reviews";
 import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 
 export default function ReviewsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -182,7 +183,7 @@ export default function ReviewsPage() {
               repositories and start reviewing pull requests to see them here.
             </p>
             <Button asChild>
-              <a href="/settings">Connect Repositories</a>
+              <Link href="/dashboard/repositories">Connect Repositories</Link>
             </Button>
           </CardContent>
         </Card>
