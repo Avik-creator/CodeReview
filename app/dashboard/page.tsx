@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -134,21 +135,59 @@ const DashboardPage = () => {
               <div className="h-80 w-full">
                 <ResponsiveContainer width={"100%"} height={"100%"}>
                   <BarChart data={monthlyActivity || []}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "var(--background)",
-                        borderColor: "var(--border)",
-                      }}
-                      itemStyle={{ color: "var(--foreground)" }}
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="hsl(var(--border))"
+                      opacity={0.4}
                     />
 
-                    <Legend />
-                    <Bar dataKey="commits" fill="#3b82f6" name="Commits" />
-                    <Bar dataKey="prs" fill="#10b981" name="Pull Requests" />
-                    <Bar dataKey="reviews" fill="#f59e0b" name="AI Reviews" />
+                    <XAxis
+                      dataKey="month"
+                      stroke="hsl(var(--muted-foreground))"
+                      tickLine={false}
+                      axisLine={false}
+                    />
+
+                    <YAxis
+                      stroke="hsl(var(--muted-foreground))"
+                      tickLine={false}
+                      axisLine={false}
+                    />
+
+                    <Tooltip
+                      cursor={false}
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--background))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+                      }}
+                      labelStyle={{
+                        color: "hsl(var(--foreground))",
+                        fontWeight: 600,
+                      }}
+                      itemStyle={{
+                        color: "hsl(var(--foreground))",
+                      }}
+                    />
+
+                    <Legend
+                      wrapperStyle={{
+                        color: "hsl(var(--muted-foreground))",
+                      }}
+                    />
+
+                    <Bar
+                      dataKey="commits"
+                      fill="#3b82f6"
+                      radius={[6, 6, 0, 0]}
+                    />
+                    <Bar dataKey="prs" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Bar
+                      dataKey="reviews"
+                      fill="#f59e0b"
+                      radius={[6, 6, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
