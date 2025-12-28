@@ -219,3 +219,33 @@ export const getRepoFileContents = async (
   }
   return files;
 };
+
+export const getPullRequestDiff = async (
+  token: string,
+  owner: string,
+  repo: string,
+  prNumber: number
+): Promise<{ title: string; diff: string; description: string }> => {
+  const octokit = new Octokit({ auth: token });
+
+  const { data: pr } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: prNumber,
+  });
+
+  const { data: diffData } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: prNumber,
+    mediaType: {
+      format: "diff",
+    },
+  });
+
+  return {
+    title: pr.title,
+    diff: diffData as unknown as string,
+    description: pr.body || "",
+  };
+};
