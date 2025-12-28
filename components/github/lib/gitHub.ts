@@ -128,11 +128,7 @@ export const createWebhook = async (owner: string, repo: string) => {
   return response.data;
 };
 
-export const deleteWebhook = async (
-  id: number,
-  owner: string,
-  repo: string
-) => {
+export const deleteWebhook = async (owner: string, repo: string) => {
   const token = await getGitHubToken();
   const octokit = new Octokit({ auth: token });
   const webhookURL = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/github`;
