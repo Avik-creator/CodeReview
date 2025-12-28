@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import Logo from '@/public/logo.png';
-import { ArrowLeft } from 'lucide-react';
+import Link from "next/link";
+import Image from "next/image";
+import Logo from "@/public/logo.png";
+import { ArrowLeft } from "lucide-react";
 export default function TermsOfUsePage() {
   return (
     <div className="min-h-screen bg-background">
@@ -15,7 +15,7 @@ export default function TermsOfUsePage() {
             <div className="flex items-center gap-3 z-10">
               <Image
                 src={Logo}
-                alt={'CodeReviewer Logo'}
+                alt={"CodeReviewer Logo"}
                 width={50}
                 height={50}
               />
@@ -68,8 +68,8 @@ export default function TermsOfUsePage() {
                   materials
                 </li>
                 <li>
-                  transfer the materials to another person or "mirror" the
-                  materials on any other server
+                  transfer the materials to another person or &quot;mirror&quot;
+                  the materials on any other server
                 </li>
               </ul>
             </section>
@@ -89,11 +89,11 @@ export default function TermsOfUsePage() {
             <section className="space-y-3">
               <h2 className="text-2xl font-semibold">4. Disclaimer</h2>
               <p className="text-muted-foreground leading-relaxed">
-                The materials on CodeReviewer are provided on an 'as is' basis.
-                CodeReviewer makes no warranties, expressed or implied, and
-                hereby disclaims and negates all other warranties including,
-                without limitation, implied warranties or conditions of
-                merchantability, fitness for a particular purpose, or
+                The materials on CodeReviewer are provided on an &apos;as
+                is&apos; basis. CodeReviewer makes no warranties, expressed or
+                implied, and hereby disclaims and negates all other warranties
+                including, without limitation, implied warranties or conditions
+                of merchantability, fitness for a particular purpose, or
                 non-infringement of intellectual property or other violation of
                 rights.
               </p>

@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import Logo from '@/public/logo.png';
-import { ArrowLeft } from 'lucide-react';
+import Link from "next/link";
+import Image from "next/image";
+import Logo from "@/public/logo.png";
+import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -16,7 +16,7 @@ export default function PrivacyPolicyPage() {
             <div className="flex items-center gap-3 z-10">
               <Image
                 src={Logo}
-                alt={'CodeReviewer Logo'}
+                alt={"CodeReviewer Logo"}
                 width={50}
                 height={50}
               />
@@ -167,7 +167,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-muted-foreground leading-relaxed">
                 We may update this Privacy Policy from time to time. We will
                 notify you of any changes by posting the new Privacy Policy on
-                this page and updating the "Last updated" date.
+                this page and updating the &quot;Last updated&quot; date.
               </p>
             </section>
 
