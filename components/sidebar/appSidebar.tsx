@@ -1,9 +1,9 @@
-'use client';
-import { Github, Moon, Sun, LogOut as Logout } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { useSession } from '@/lib/auth-client';
+"use client";
+import { Github, Moon, Sun, LogOut as Logout } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { useSession } from "@/lib/auth-client";
 import {
   Sidebar,
   SidebarContent,
@@ -13,19 +13,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-} from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
-import LogOut from '@/components/auth/components/logOut';
-import { NAVIGATION_ITEMS } from '@/lib/utils';
-import { Button } from '../ui/button';
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import LogOut from "@/components/auth/components/logOut";
+import { NAVIGATION_ITEMS } from "@/lib/utils";
+import { Button } from "../ui/button";
 
 const AppSidebar = () => {
   const { theme, setTheme } = useTheme();
@@ -38,20 +38,20 @@ const AppSidebar = () => {
   });
 
   const isActive = (url: string) => {
-    return pathname === url || pathname.startsWith(url + '/dashboard');
+    return pathname === url || pathname.startsWith(url + "/dashboard");
   };
 
   if (!mounted || !session) return null;
 
   const user = session.user;
-  const userName = user.name || 'GUEST';
-  const userEmail = user.email || '';
-  const userAvatar = user.image || '';
+  const userName = user.name || "GUEST";
+  const userEmail = user.email || "";
+  const userAvatar = user.image || "";
 
   const userInitials = userName
-    .split(' ')
-    .map(n => n[0])
-    .join('')
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
     .toUpperCase();
 
   return (
@@ -77,19 +77,19 @@ const AppSidebar = () => {
       <SidebarContent className="px-3 py-4">
         <div className="mb-3">
           <p className="text-xs font-semibold text-muted-foreground px-3 mb-2 uppercase tracking-wider">
-            Navigation
+            Menu
           </p>
         </div>
         <SidebarMenu className="gap-1">
-          {NAVIGATION_ITEMS.map(item => (
+          {NAVIGATION_ITEMS.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
                 className={`h-11 px-3 rounded-lg transition-all duration-200 ${
                   isActive(item.url)
-                    ? 'bg-primary/10 text-primary font-semibold border border-primary/20 shadow-sm'
-                    : 'hover:bg-accent text-muted-foreground hover:text-foreground'
+                    ? "bg-primary/10 text-primary font-semibold border border-primary/20 shadow-sm"
+                    : "hover:bg-accent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Link href={item.url} className="flex items-center gap-3">
@@ -113,7 +113,7 @@ const AppSidebar = () => {
                 >
                   <Avatar className="h-10 w-10 rounded-lg border-2 border-primary/20 shadow-sm">
                     <AvatarImage
-                      src={userAvatar || '/placeholder.svg'}
+                      src={userAvatar || "/placeholder.svg"}
                       alt={userName}
                     />
                     <AvatarFallback className="rounded-lg bg-primary/10 text-primary font-semibold">
@@ -144,16 +144,16 @@ const AppSidebar = () => {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="cursor-pointer px-3 py-2.5 rounded-lg hover:bg-accent transition-colors"
                 >
-                  {theme === 'dark' ? (
+                  {theme === "dark" ? (
                     <Sun className="w-4 h-4 mr-3 shrink-0" />
                   ) : (
                     <Moon className="w-4 h-4 mr-3 shrink-0" />
                   )}
                   <span className="text-sm font-medium">
-                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                    {theme === "dark" ? "Light Mode" : "Dark Mode"}
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
