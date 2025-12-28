@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ExternalLink, Search } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRepositories } from "@/hooks/repositories/use-repositories";
 import { RepositoryListSkeleton } from "@/components/skeleton/repositorySkeleton";
 
@@ -33,13 +33,7 @@ const RepositoryPage = () => {
     number | null
   >(null);
 
-  const observerTarget = useRef({
-    onIntersect: () => {
-      if (hasNextPage) {
-        fetchNextPage();
-      }
-    },
-  });
+  const observerTarget = useRef<HTMLDivElement | null>(null);
 
   const {
     data,
@@ -49,6 +43,56 @@ const RepositoryPage = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useRepositories();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Repositories</h1>
+          <p className="text-muted-foreground">
+            Manage and View all Github Repositories
+          </p>
+        </div>
+        <RepositoryListSkeleton />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Repositories</h1>
+          <p className="text-muted-foreground">
+            Manage and View all Github Repositories
+          </p>
+        </div>
+        <div className="text-red-500">Failed to load repositories.</div>
+      </div>
+    );
+  }
 
   const allRepositories: RepositoryInterface[] =
     data?.pages.flatMap((page) => page) || [];
