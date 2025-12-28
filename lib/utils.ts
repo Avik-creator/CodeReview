@@ -36,9 +36,15 @@ export const getInitials = (name: string) => {
     .toUpperCase();
 };
 
-export const formatDate = (date: Date) => {
+export const formatDate = (date: Date | string | null | undefined): string => {
+  if (!date) return "";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(dateObj.getTime())) return "";
+
   return new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
-  }).format(date);
+  }).format(dateObj);
 };

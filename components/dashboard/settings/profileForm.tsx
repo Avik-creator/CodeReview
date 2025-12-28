@@ -90,9 +90,7 @@ export const ProfileForm = () => {
               </p>
               <div className="flex items-center gap-2 mt-2 sm:mt-3 text-xs sm:text-sm text-muted-foreground justify-center sm:justify-start">
                 <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-                <span>
-                  Joined {formatDate(new Date(profileData?.createdAt || ""))}
-                </span>
+                <span>Joined {formatDate(profileData?.createdAt)}</span>
               </div>
             </div>
           </div>

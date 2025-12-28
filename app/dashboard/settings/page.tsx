@@ -1,5 +1,7 @@
 "use client";
 
+import { ProfileForm } from "@/components/dashboard/settings/profileForm";
+
 const SettingsPage = () => {
   return (
     <div className="space-y-6">
@@ -9,6 +11,7 @@ const SettingsPage = () => {
           Manage your account setting and connected Repositories.
         </p>
       </div>
+      <ProfileForm />
     </div>
   );
 };
