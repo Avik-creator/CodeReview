@@ -176,7 +176,10 @@ export async function getContributionStats() {
         level: Math.min(4, Math.floor(day.contributionCount / 3)),
       }))
     );
-    return contributions;
+    return {
+      contributions,
+      totalContributions: calendar.totalContributions,
+    };
   } catch (error) {
     console.error("Error fetching contribution stats:", error);
     return null;

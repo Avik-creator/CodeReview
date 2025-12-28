@@ -17,17 +17,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import {
-  GitCommit,
-  GitPullRequest,
-  MessageSquare,
-  GitBranch,
-} from "lucide-react";
+import { GitCommit, GitBranch } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 
 import { getDashboardStats, getMonthlyActivity } from "../actions/dashboard";
 import ContributionGraph from "@/components/dashboard/contributionGraph";
+import { Spinner } from "@/components/ui/spinner";
 
 const DashboardPage = () => {
   const { data: stats, isLoading } = useQuery({
@@ -119,6 +115,47 @@ const DashboardPage = () => {
           <ContributionGraph />
         </CardContent>
       </Card>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Activity Overview</CardTitle>
+            <CardDescription>
+              Monthly Breakdown of Commits, PR&apos;s, and Reviews (Last 6
+              Months)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isMonthlyActivityLoading ? (
+              <div className="h-80 w-full flex items-center justify-center">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="h-80 w-full">
+                <ResponsiveContainer width={"100%"} height={"100%"}>
+                  <BarChart data={monthlyActivity || []}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "var(--background)",
+                        borderColor: "var(--border)",
+                      }}
+                      itemStyle={{ color: "var(--foreground)" }}
+                    />
+
+                    <Legend />
+                    <Bar dataKey="commits" fill="#3b82f6" name="Commits" />
+                    <Bar dataKey="prs" fill="#10b981" name="Pull Requests" />
+                    <Bar dataKey="reviews" fill="#f59e0b" name="AI Reviews" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
