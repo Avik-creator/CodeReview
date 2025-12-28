@@ -3,6 +3,19 @@
 import { getPullRequestDiff } from "@/components/github/lib/gitHub";
 import { inngest } from "@/inngest/client";
 import prisma from "@/lib/db";
+import { prReviewRatelimit } from "@/lib/ratelimit";
+import { headers } from "next/headers";
+
+async function getClientIp(): Promise<string> {
+  const headersList = await headers();
+  // Try to get IP from various headers that proxies might set
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
+    headersList.get("x-real-ip") ||
+    headersList.get("cf-connecting-ip") ||
+    "unknown";
+  return ip;
+}
 
 export async function reviewPullRequest(
   owner: string,
@@ -10,6 +23,19 @@ export async function reviewPullRequest(
   prNumber: number
 ) {
   try {
+    // Rate limit by client IP address
+    const ip = await getClientIp();
+    const { success, limit, remaining, reset } = await prReviewRatelimit.limit(
+      ip
+    );
+
+    if (!success) {
+      const resetTime = new Date(reset);
+      throw new Error(
+        `Rate limit exceeded. Maximum 5 requests per minute. Resets at ${resetTime.toISOString()}. Remaining: ${remaining}`
+      );
+    }
+
     const repository = await prisma.repository.findFirst({
       where: {
         owner,

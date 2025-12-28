@@ -85,7 +85,7 @@ export const connectRepository = async (
 
   try {
     await inngest.send({
-      name: "respository.connected",
+      name: "repository.connected",
       data: {
         owner,
         repo,

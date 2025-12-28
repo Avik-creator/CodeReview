@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Octokit } from "octokit";
 import { MONTH_NAMES } from "@/lib/utils";
+import prisma from "@/lib/db";
 
 interface ContributionDay {
   date: string;
@@ -35,14 +36,18 @@ async function getCurrentSession() {
 
 export async function getDashboardStats() {
   try {
-    // Get users Github Username
-    const { token, octokit } = await getCurrentSession();
+    const { session, token, octokit } = await getCurrentSession();
 
     const { data: user } = await octokit.rest.users.getAuthenticated();
 
     // TODO: FETCH THE TOTAL CONNECTED REPOS FROM DB
 
-    const totalRepos = 30;
+    const totalRepos = await prisma.repository.count({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
     const calendar = await fetchUserContribution(token, user.login!);
     const totalCommits = calendar?.totalContributions || 0;
 
@@ -51,8 +56,15 @@ export async function getDashboardStats() {
       per_page: 1,
     });
     const totalPrs = prs.total_count;
-    // TODO: Count AI Reviews from Database
-    const totalReviews = 44;
+
+    // Count AI Reviews from Database through repository relationship
+    const totalReviews = await prisma.review.count({
+      where: {
+        repository: {
+          userId: session.user.id,
+        },
+      },
+    });
 
     return {
       totalCommits,

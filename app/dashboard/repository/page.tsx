@@ -190,6 +190,7 @@ const RepositoryPage = () => {
 
                   <Button
                     onClick={() => handleConnect(repo)}
+                    className="cursor-pointer"
                     disabled={
                       localConnectingRepoId === repo.id || repo.isConnected
                     }

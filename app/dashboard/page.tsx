@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Card,
   CardContent,
@@ -6,6 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
   BarChart,
@@ -25,6 +27,19 @@ import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats, getMonthlyActivity } from "../actions/dashboard";
 import ContributionGraph from "@/components/dashboard/contributionGraph";
 import { Spinner } from "@/components/ui/spinner";
+
+const StatCardSkeleton = () => (
+  <Card>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-4 w-4 rounded" />
+    </CardHeader>
+    <CardContent>
+      <Skeleton className="h-8 w-16 mb-2" />
+      <Skeleton className="h-3 w-40" />
+    </CardContent>
+  </Card>
+);
 
 const DashboardPage = () => {
   const { data: stats, isLoading } = useQuery({
@@ -49,62 +64,82 @@ const DashboardPage = () => {
           Reviews.
         </p>
       </div>
+
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Repositories
-            </CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? "..." : stats?.totalRepos || 0}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Number of Connected Repositories
-            </p>
-          </CardContent>
-        </Card>
+        {isLoading ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Repositories
+                </CardTitle>
+                <GitBranch className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats?.totalRepos || 0}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Number of Connected Repositories
+                </p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Commits</CardTitle>
-            <GitCommit className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? "..." : stats?.totalCommits || 0}
-            </div>
-            <p className="text-sm text-muted-foreground">In the last year</p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Commits
+                </CardTitle>
+                <GitCommit className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats?.totalCommits || 0}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  In the last year
+                </p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total PRs</CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? "..." : stats?.totalPrs || 0}
-            </div>
-            <p className="text-sm text-muted-foreground">All Time</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">AI Reviews</CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? "..." : stats?.totalReviews || 0}
-            </div>
-            <p className="text-sm text-muted-foreground">Generated Reviews</p>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total PRs</CardTitle>
+                <GitBranch className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats?.totalPrs || 0}</div>
+                <p className="text-sm text-muted-foreground">All Time</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  AI Reviews
+                </CardTitle>
+                <GitBranch className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats?.totalReviews || 0}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Generated Reviews
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Contribution Activity</CardTitle>
@@ -113,7 +148,21 @@ const DashboardPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ContributionGraph />
+          {isLoading ? (
+            <div className="space-y-3">
+              <div className="flex gap-1">
+                {Array.from({ length: 52 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    {Array.from({ length: 7 }).map((_, j) => (
+                      <Skeleton key={j} className="w-3 h-3 rounded-sm" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <ContributionGraph />
+          )}
         </CardContent>
       </Card>
 
@@ -143,13 +192,13 @@ const DashboardPage = () => {
 
                     <XAxis
                       dataKey="month"
-                      stroke="hsl(var(--muted-foreground))"
+                      stroke="var(--axis-stroke)"
                       tickLine={false}
                       axisLine={false}
                     />
 
                     <YAxis
-                      stroke="hsl(var(--muted-foreground))"
+                      stroke="var(--axis-stroke)"
                       tickLine={false}
                       axisLine={false}
                     />

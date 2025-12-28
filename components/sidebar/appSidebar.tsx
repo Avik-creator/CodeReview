@@ -1,7 +1,6 @@
 "use client";
 import { Github, Moon, Sun, LogOut as Logout } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import {
@@ -12,7 +11,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,23 +23,17 @@ import {
 import Link from "next/link";
 import LogOut from "@/components/auth/components/logOut";
 import { NAVIGATION_ITEMS } from "@/lib/utils";
-import { Button } from "../ui/button";
 
 const AppSidebar = () => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState();
   const pathname = usePathname();
   const { data: session } = useSession();
-
-  useEffect(() => {
-    setMounted(true);
-  });
 
   const isActive = (url: string) => {
     return pathname === url || pathname.startsWith(url + "/dashboard");
   };
 
-  if (!mounted || !session) return null;
+  if (!session) return null;
 
   const user = session.user;
   const userName = user.name || "GUEST";
