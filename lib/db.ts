@@ -1,13 +1,28 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
-
 import { PrismaPg } from "@prisma/adapter-pg";
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
+import { Pool } from "pg";
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({ adapter });
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    // Neon-specific settings
+    max: 10, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+  });
+
+  const adapter = new PrismaPg(pool);
+
+  return new PrismaClient({
+    adapter,
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
 };
 
 declare const globalThis: {
