@@ -14,7 +14,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRepositories } from "@/hooks/repositories/use-repositories";
 import { RepositoryListSkeleton } from "@/components/skeleton/repositorySkeleton";
-
+import { useConnectRepository } from "@/hooks/repositories/useConnectRepository";
 interface RepositoryInterface {
   id: number;
   name: string;
@@ -43,6 +43,8 @@ const RepositoryPage = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useRepositories();
+
+  const { mutate: connectRepository } = useConnectRepository();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,14 +105,21 @@ const RepositoryPage = () => {
       repo.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleConnect = async (repo: RepositoryInterface) => {
+  const handleConnect = (repo: RepositoryInterface) => {
     try {
       setLocalConnectingRepoId(repo.id);
 
       // TODO: replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      console.log("Connected repo:", repo.full_name);
+      connectRepository(
+        {
+          owner: repo.full_name.split("/")[0],
+          repo: repo.name,
+          githubId: repo.id,
+        },
+        {
+          onSettled: () => setLocalConnectingRepoId(null),
+        }
+      );
     } catch (error) {
       console.error("Failed to connect repository", error);
     } finally {
