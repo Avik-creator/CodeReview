@@ -19,7 +19,11 @@ export const useConnectRepository = () => {
       return await connectRepository(owner, repo, githubId);
     },
     onSuccess: () => {
+      // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ["repositories"] });
+      queryClient.invalidateQueries({ queryKey: ["connectedRepositories"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-activity"] });
       toast.success("Repository connected successfully!");
     },
     onError: (error) => {

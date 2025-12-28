@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { createWebhook, getRepositories } from "@/components/github/lib/gitHub";
 import { inngest } from "@/inngest/client";
+import { prReviewRatelimit } from "@/lib/ratelimit";
+import { revalidatePath } from "next/cache";
 
 export const fetchRepositories = async (
   page: number = 1,
@@ -95,6 +97,11 @@ export const connectRepository = async (
   } catch (error) {
     console.error("Failed to Trigger Repository Indexing:", error);
   }
+
+  // Revalidate paths to ensure other pages are updated
+  revalidatePath("/dashboard/repository", "page");
+  revalidatePath("/dashboard/settings", "page");
+  revalidatePath("/dashboard", "page");
 
   return webHook;
 };
