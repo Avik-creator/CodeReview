@@ -71,7 +71,7 @@ export const connectRepository = async (
     throw new Error("Repository is already connected.");
   }
   // Connect the repository
-  const newRepo = await prisma.repository.create({
+  await prisma.repository.create({
     data: {
       githubId: BigInt(githubId),
       owner,
