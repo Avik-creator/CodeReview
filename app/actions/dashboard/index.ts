@@ -7,7 +7,6 @@ import {
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Octokit } from "octokit";
-import prisma from "@/lib/db";
 import { MONTH_NAMES } from "@/lib/utils";
 
 interface ContributionDay {
@@ -37,7 +36,7 @@ async function getCurrentSession() {
 export async function getDashboardStats() {
   try {
     // Get users Github Username
-    const { session, token, octokit } = await getCurrentSession();
+    const { token, octokit } = await getCurrentSession();
 
     const { data: user } = await octokit.rest.users.getAuthenticated();
 
@@ -74,7 +73,7 @@ export async function getDashboardStats() {
 
 export async function getMonthlyActivity() {
   try {
-    const { session, token, octokit } = await getCurrentSession();
+    const { token, octokit } = await getCurrentSession();
     const { data: user } = await octokit.rest.users.getAuthenticated();
     const calendar = await fetchUserContribution(token, user.login!);
     if (!calendar) {

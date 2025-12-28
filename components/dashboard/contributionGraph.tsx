@@ -31,6 +31,24 @@ const ContributionGraph = () => {
       </div>
     );
   }
+
+  // Enhanced dark mode color palette with better contrast and visibility
+  const darkThemeColors = [
+    "hsl(220, 13%, 18%)", // Level 0 - Very dark gray (better than #161b22)
+    "hsl(142, 50%, 35%)", // Level 1 - Darker green
+    "hsl(142, 60%, 45%)", // Level 2 - Medium green
+    "hsl(142, 70%, 55%)", // Level 3 - Bright green
+    "hsl(142, 80%, 65%)", // Level 4 - Very bright green
+  ];
+
+  const lightThemeColors = [
+    "hsl(0, 0%, 92%)", // Level 0 - Light gray
+    "hsl(142, 40%, 70%)", // Level 1 - Light green
+    "hsl(142, 50%, 55%)", // Level 2 - Medium green
+    "hsl(142, 65%, 45%)", // Level 3 - Bright green
+    "hsl(142, 71%, 40%)", // Level 4 - Deep green
+  ];
+
   return (
     <div className="w-full flex flex-col items-center gap-4 p-4">
       <div className="text-sm text-muted-foreground">
@@ -50,8 +68,14 @@ const ContributionGraph = () => {
             showWeekdayLabels
             showMonthLabels
             theme={{
-              light: ["hsl(0, 0%, 92%", "hsl(142, 71%, 45%)"],
-              dark: ["#161b22", "hsl(142, 71%, 45%)"],
+              light: lightThemeColors,
+              dark: darkThemeColors,
+            }}
+            labels={{
+              legend: {
+                less: "Less",
+                more: "More",
+              },
             }}
           />
         </div>

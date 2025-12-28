@@ -27,3 +27,18 @@ export const MONTH_NAMES = [
   "Nov",
   "Dec",
 ];
+
+export const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+};
+
+export const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+};
