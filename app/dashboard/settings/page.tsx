@@ -1,6 +1,7 @@
 "use client";
 
 import { ProfileForm } from "@/components/dashboard/settings/profileForm";
+import { RepositoryList } from "@/components/dashboard/settings/repositoryList";
 
 const SettingsPage = () => {
   return (
@@ -12,6 +13,7 @@ const SettingsPage = () => {
         </p>
       </div>
       <ProfileForm />
+      <RepositoryList />
     </div>
   );
 };
