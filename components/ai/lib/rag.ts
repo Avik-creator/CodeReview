@@ -13,10 +13,10 @@ export async function generateEmbeddings(text: string, apiKey: string) {
 
 export async function indexCodebase(
   repoId: string,
-  files: {
+  files: Array<{
     path: string;
     content: string;
-  }[],
+  }>,
   apiKey: string
 ) {
   const vectors = [];

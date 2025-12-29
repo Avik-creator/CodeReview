@@ -2,13 +2,14 @@ import prisma from "@/lib/db";
 import { inngest } from "../client";
 import { getRepoFileContents } from "@/components/github/lib/gitHub";
 import { indexCodebase } from "@/components/ai/lib/rag";
+import { decrypt } from "@/lib/encryption";
 
 export const indexRepo = inngest.createFunction(
   { id: "index-repo" },
   { event: "repository.connected" },
   async ({ event, step }) => {
     const { owner, repo, userId } = event.data;
-    const files = await step.run("fetch-files", async () => {
+    const { files, apiKey } = await step.run("fetch-files", async () => {
       const account = await prisma.account.findFirst({
         where: {
           userId: userId,
@@ -21,12 +22,31 @@ export const indexRepo = inngest.createFunction(
         });
       }
 
-      return await getRepoFileContents(owner, repo, account.accessToken);
+      // Get user's encrypted API key
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { encryptedApiKey: true },
+      });
+
+      if (!user?.encryptedApiKey) {
+        throw new Error(
+          "Google Generative AI API key not configured. Please save your API key in settings."
+        );
+      }
+
+      const decryptedApiKey = decrypt(user.encryptedApiKey);
+
+      const repoFiles = await getRepoFileContents(
+        owner,
+        repo,
+        account.accessToken
+      );
+      return { files: repoFiles, apiKey: decryptedApiKey };
     });
 
     await step.run("index-codebase", async () => {
       // Logic to index the codebase using Pinecone
-      await indexCodebase(`${owner}/${repo}`, files);
+      await indexCodebase(`${owner}/${repo}`, files, apiKey);
     });
 
     return { success: true, indexedFiles: files.length };
