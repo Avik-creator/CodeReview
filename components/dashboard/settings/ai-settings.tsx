@@ -73,8 +73,6 @@ export const AISettings = () => {
   }, []);
 
   const handleSave = async () => {
-    localStorage.setItem("gemini_api_key", apiKey);
-
     setIsSaving(true);
     try {
       const result = await updateUserRules({
@@ -84,9 +82,7 @@ export const AISettings = () => {
       });
 
       if (result.success) {
-        toast.success(
-          "Settings saved. API key stored locally and encrypted in your account."
-        );
+        toast.success("Settings saved successfully");
       } else {
         toast.error(result.error || "Failed to save settings");
       }
