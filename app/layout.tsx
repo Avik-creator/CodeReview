@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description:
       "Having Trouble Getting your PR reviewed, worry not! CodeReviewer is here to save the day.",
     url: "https://codereviewer.avikmukherjee.me",
-    siteName: "Avik Mukherjee's Portfolio",
+    siteName: "CodeReviewer",
     images: [
       {
         url: "/og-image.webp",
