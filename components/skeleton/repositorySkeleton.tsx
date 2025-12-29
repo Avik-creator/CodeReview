@@ -13,7 +13,7 @@ export function RepositoryCardSkeleton() {
             </div>
             <Skeleton className="h-3 xs:h-4 sm:h-4 md:h-4 w-full max-w-xs xs:max-w-sm sm:max-w-md" />
           </div>
-          <div className="flex gap-1.5 xs:gap-2 sm:gap-2 md:gap-3 w-full xs:w-auto flex-shrink-0">
+          <div className="flex gap-1.5 xs:gap-2 sm:gap-2 md:gap-3 w-full xs:w-auto shrink-0">
             <Skeleton className="h-8 xs:h-8 sm:h-9 md:h-9 w-8 xs:w-8 sm:w-9 md:w-9" />
             <Skeleton className="h-8 xs:h-8 sm:h-9 md:h-9 w-20 xs:w-20 sm:w-24 md:w-28" />
           </div>

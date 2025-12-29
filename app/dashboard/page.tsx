@@ -154,7 +154,7 @@ const DashboardPage = () => {
                 {Array.from({ length: 52 }).map((_, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-0.5 sm:gap-1 flex-shrink-0"
+                    className="flex flex-col gap-0.5 sm:gap-1 shrink-0"
                   >
                     {Array.from({ length: 7 }).map((_, j) => (
                       <Skeleton
