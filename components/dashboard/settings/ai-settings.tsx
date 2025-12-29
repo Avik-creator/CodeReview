@@ -52,24 +52,24 @@ export const AISettings = () => {
   const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
-    const storedKey = localStorage.getItem("gemini_api_key");
-    if (storedKey) setApiKey(storedKey);
-
-    const fetchRules = async () => {
+    const fetchSettings = async () => {
       try {
-        const userRules = await getUserRules();
+        const userSettings = await getUserRules();
         setRules({
-          good: userRules.goodRules,
-          bad: userRules.badRules,
+          good: userSettings.goodRules,
+          bad: userSettings.badRules,
         });
+        if (userSettings.apiKey) {
+          setApiKey(userSettings.apiKey);
+        }
       } catch (error) {
-        console.error("Failed to fetch rules", error);
+        console.error("Failed to fetch settings", error);
         toast.error("Failed to load settings");
       } finally {
         setIsLoaded(true);
       }
     };
-    fetchRules();
+    fetchSettings();
   }, []);
 
   const handleSave = async () => {
@@ -78,7 +78,7 @@ export const AISettings = () => {
       const result = await updateUserRules({
         goodRules: rules.good,
         badRules: rules.bad,
-        apiKey, // Also save encrypted version in DB for webhook support
+        apiKey,
       });
 
       if (result.success) {
@@ -136,8 +136,8 @@ export const AISettings = () => {
                 Gemini API Key
               </CardTitle>
               <CardDescription className="text-base">
-                Your API key is stored securely in your browser and used for
-                AI-powered code reviews
+                Your API key is encrypted and stored securely in your account
+                for AI-powered code reviews
               </CardDescription>
             </div>
             {apiKey && (

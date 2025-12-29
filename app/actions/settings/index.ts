@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { deleteWebhook } from "@/components/github/lib/gitHub";
-import { encrypt } from "@/lib/encryption";
+import { encrypt, decrypt } from "@/lib/encryption";
 
 export async function getUserProfile() {
   try {
@@ -87,12 +87,29 @@ export async function getUserRules() {
       select: {
         goodRules: true,
         badRules: true,
+        encryptedApiKey: true,
       },
     });
     if (!user) {
       throw new Error("User not found", { cause: "Not Found" });
     }
-    return user;
+
+    // Decrypt API key if it exists
+    let apiKey: string | null = null;
+    if (user.encryptedApiKey) {
+      try {
+        apiKey = decrypt(user.encryptedApiKey);
+      } catch {
+        // If decryption fails, treat as no API key
+        apiKey = null;
+      }
+    }
+
+    return {
+      goodRules: user.goodRules,
+      badRules: user.badRules,
+      apiKey,
+    };
   } catch (error) {
     throw new Error("Failed to fetch user rules", {
       cause: error,
