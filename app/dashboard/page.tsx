@@ -149,12 +149,18 @@ const DashboardPage = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="space-y-3">
-              <div className="flex gap-1">
+            <div className="space-y-3 w-full">
+              <div className="flex gap-0.5 sm:gap-1 w-full overflow-x-auto pb-2">
                 {Array.from({ length: 52 }).map((_, i) => (
-                  <div key={i} className="flex flex-col gap-1">
+                  <div
+                    key={i}
+                    className="flex flex-col gap-0.5 sm:gap-1 flex-shrink-0"
+                  >
                     {Array.from({ length: 7 }).map((_, j) => (
-                      <Skeleton key={j} className="w-3 h-3 rounded-sm" />
+                      <Skeleton
+                        key={j}
+                        className="w-2 h-2 sm:w-3 sm:h-3 rounded-sm"
+                      />
                     ))}
                   </div>
                 ))}

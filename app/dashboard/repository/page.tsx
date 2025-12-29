@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Search } from "lucide-react";
+import { ExternalLink, Loader2, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRepositories } from "@/hooks/repositories/use-repositories";
@@ -136,20 +136,22 @@ const RepositoryPage = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-4 sm:px-6 lg:px-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Repositories</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Repositories
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1">
           Manage and connect your GitHub repositories to enable AI-powered code
           reviews.
         </p>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search repositories"
-          className="pl-8"
+          className="pl-9"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -159,25 +161,31 @@ const RepositoryPage = () => {
         {filteredRepositories.map((repo) => (
           <Card key={repo.id} className="transition-shadow hover:shadow-md">
             <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="space-y-2 flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <CardTitle className="text-lg">{repo.name}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg wrap-break-word">
+                      {repo.name}
+                    </CardTitle>
                     {repo.language && (
-                      <Badge variant="outline">{repo.language}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {repo.language}
+                      </Badge>
                     )}
                     {repo.isConnected && (
-                      <Badge variant="secondary">Connected</Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        Connected
+                      </Badge>
                     )}
                   </div>
 
-                  <CardDescription>
+                  <CardDescription className="text-sm wrap-break-word">
                     {repo.description ||
                       "No description provided for this repository."}
                   </CardDescription>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <Button variant="ghost" size="icon" asChild>
                     <Link
                       href={repo.html_url}
@@ -195,12 +203,18 @@ const RepositoryPage = () => {
                       localConnectingRepoId === repo.id || repo.isConnected
                     }
                     variant={repo.isConnected ? "outline" : "default"}
+                    size="sm"
                   >
-                    {localConnectingRepoId === repo.id
-                      ? "Connecting..."
-                      : repo.isConnected
-                      ? "Connected"
-                      : "Connect"}
+                    {localConnectingRepoId === repo.id ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        <span className="hidden sm:inline">Connecting...</span>
+                      </>
+                    ) : repo.isConnected ? (
+                      "Connected"
+                    ) : (
+                      "Connect"
+                    )}
                   </Button>
                 </div>
               </div>
@@ -208,10 +222,11 @@ const RepositoryPage = () => {
           </Card>
         ))}
       </div>
+
       <div ref={observerTarget} className="py-4">
         {isFetchingNextPage && <RepositoryListSkeleton />}
         {!hasNextPage && allRepositories.length > 0 && (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-xs sm:text-sm text-muted-foreground">
             You have reached the end of the list.
           </p>
         )}

@@ -198,7 +198,7 @@ export default function ReviewsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             PR Reviews
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-2">
             {reviews.length} review{reviews.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function ReviewsPage() {
                       })}
                     </span>
                   </div>
-                  <CardTitle className="text-lg sm:text-xl mb-2 wrap-break-words">
+                  <CardTitle className="text-lg sm:text-xl mb-2 wrap-break-word">
                     {review.prTitle}
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2 flex-wrap">
