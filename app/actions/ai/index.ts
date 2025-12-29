@@ -20,7 +20,12 @@ async function getClientIp(): Promise<string> {
 export async function reviewPullRequest(
   owner: string,
   repo: string,
-  prNumber: number
+  prNumber: number,
+  settings?: {
+    apiKey?: string;
+    goodRules?: string[];
+    badRules?: string[];
+  }
 ) {
   try {
     // Rate limit by client IP address
@@ -79,6 +84,9 @@ export async function reviewPullRequest(
         prNumber,
         userId: repository.user.id,
         title,
+        apiKey: settings?.apiKey,
+        goodRules: settings?.goodRules || repository.user.goodRules,
+        badRules: settings?.badRules || repository.user.badRules,
       },
     });
 
@@ -111,5 +119,9 @@ export async function reviewPullRequest(
     } catch (dbError) {
       console.error("Failed to log PR review failure:", dbError);
     }
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }

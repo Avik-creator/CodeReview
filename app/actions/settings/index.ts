@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { deleteWebhook } from "@/components/github/lib/gitHub";
+import { encrypt } from "@/lib/encryption";
 
 export async function getUserProfile() {
   try {
@@ -69,6 +70,74 @@ export async function updateUserProfile(data: {
     return {
       success: false,
       error: "Failed to update user profile",
+    };
+  }
+}
+
+export async function getUserRules() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session?.user) {
+      throw new Error("No active session found", { cause: "Unauthorized" });
+    }
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        goodRules: true,
+        badRules: true,
+      },
+    });
+    if (!user) {
+      throw new Error("User not found", { cause: "Not Found" });
+    }
+    return user;
+  } catch (error) {
+    throw new Error("Failed to fetch user rules", {
+      cause: error,
+    });
+  }
+}
+
+export async function updateUserRules(data: {
+  goodRules?: string[];
+  badRules?: string[];
+  apiKey?: string;
+}) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    if (!session?.user) {
+      throw new Error("No active session found", { cause: "Unauthorized" });
+    }
+
+    // Encrypt the API key before storing
+    const encryptedApiKey = data.apiKey ? encrypt(data.apiKey) : undefined;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        goodRules: data.goodRules,
+        badRules: data.badRules,
+        ...(encryptedApiKey && { encryptedApiKey }),
+      },
+      select: {
+        goodRules: true,
+        badRules: true,
+      },
+    });
+    revalidatePath("/dashboard/settings", "page");
+
+    return {
+      success: true,
+      rules: updatedUser,
+    };
+  } catch {
+    return {
+      success: false,
+      error: "Failed to update user rules",
     };
   }
 }

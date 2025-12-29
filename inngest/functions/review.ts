@@ -6,7 +6,7 @@ import {
 import { retrieveContext } from "@/components/ai/lib/rag";
 import prisma from "@/lib/db";
 import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
 export const generateReview = inngest.createFunction(
   {
@@ -45,10 +45,46 @@ export const generateReview = inngest.createFunction(
     });
 
     const context = await step.run("retrieve-context", async () => {
+      const { apiKey } = event.data as { apiKey?: string };
+      if (!apiKey) {
+        throw new Error(
+          "Google Generative AI API key is required in event data"
+        );
+      }
       const query = `${PrTitle}\n${description}`;
-      return retrieveContext(query, `${owner}/${repo}`);
+      return retrieveContext(query, `${owner}/${repo}`, apiKey);
     });
     const review = await step.run("generate-ai-review", async () => {
+      const { apiKey, goodRules, badRules } = event.data as {
+        apiKey?: string;
+        goodRules?: string[];
+        badRules?: string[];
+      };
+
+      if (!apiKey) {
+        throw new Error(
+          "Google Generative AI API key is required in event data"
+        );
+      }
+
+      let rulesPrompt = "";
+      if (goodRules?.length || badRules?.length) {
+        rulesPrompt += "\n\n**Custom Review Rules:**\n";
+        if (goodRules?.length) {
+          rulesPrompt +=
+            "Please follow these GOOD practices:\n" +
+            goodRules.map((r: string) => `- ${r}`).join("\n") +
+            "\n";
+        }
+        if (badRules?.length) {
+          rulesPrompt +=
+            "Please avoid these BAD practices:\n" +
+            badRules.map((r: string) => `- ${r}`).join("\n") +
+            "\n";
+        }
+        rulesPrompt += "\nJudge the code based on these rules.";
+      }
+
       const prompt = `You are an expert code reviewer. Analyze the following pull request and provide a detailed, constructive code review.
 
 PR Title: ${title}
@@ -61,6 +97,7 @@ Code Changes:
 \`\`\`diff
 ${diff}
 \`\`\`
+${rulesPrompt}
 
 Please provide:
 1. **Walkthrough**: A file-by-file explanation of the changes.
@@ -73,8 +110,13 @@ Please provide:
 
 Format your response in markdown.`;
 
+      const google = createGoogleGenerativeAI({
+        apiKey: apiKey,
+      });
+      const model = google("gemini-2.5-flash");
+
       const { text } = await generateText({
-        model: google("gemini-2.5-flash"),
+        model,
         prompt,
       });
 

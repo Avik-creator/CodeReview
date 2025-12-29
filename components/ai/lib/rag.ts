@@ -1,8 +1,9 @@
 import { pineconeIndex } from "@/lib/pineCone";
 import { embed } from "ai";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-export async function generateEmbeddings(text: string) {
+export async function generateEmbeddings(text: string, apiKey: string) {
+  const google = createGoogleGenerativeAI({ apiKey });
   const { embedding } = await embed({
     model: google.embeddingModel("text-embedding-004"),
     value: text,
@@ -15,14 +16,15 @@ export async function indexCodebase(
   files: {
     path: string;
     content: string;
-  }[]
+  }[],
+  apiKey: string
 ) {
   const vectors = [];
   for (const file of files) {
     const content = `File: ${file.path}\n\n${file.content}`;
     const truncatedContent = content.slice(0, 8000);
     try {
-      const embeddings = await generateEmbeddings(truncatedContent);
+      const embeddings = await generateEmbeddings(truncatedContent, apiKey);
       vectors.push({
         id: `${repoId}-${file.path.replace(/\//g, "_")}`,
         values: embeddings,
@@ -58,9 +60,10 @@ export async function indexCodebase(
 export async function retrieveContext(
   query: string,
   repoId: string,
+  apiKey: string,
   topK: number = 5
 ) {
-  const embeddings = await generateEmbeddings(query);
+  const embeddings = await generateEmbeddings(query, apiKey);
   const results = await pineconeIndex.query({
     vector: embeddings,
     filter: { repoId },
