@@ -11,10 +11,39 @@ import {
 } from "@/components/ai/lib/issueContext";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { reviewPullRequest } from "@/app/actions/ai";
+
+// Keywords that trigger a full PR re-review
+const REVIEW_KEYWORDS = [
+  "review",
+  "re-review",
+  "rereview",
+  "review again",
+  "check again",
+  "review changes",
+  "review the changes",
+  "review this",
+  "analyze",
+  "analyze again",
+];
 
 /**
- * Handle @codereviewerai mention in GitHub PR comments
+ * Check if the query is requesting a full PR re-review
+ */
+function isReviewRequest(query: string): boolean {
+  const lowerQuery = query.toLowerCase().trim();
+  return REVIEW_KEYWORDS.some(
+    (keyword) =>
+      lowerQuery.includes(keyword) ||
+      lowerQuery === keyword ||
+      lowerQuery.startsWith(keyword)
+  );
+}
+
+/**
+ * Handle @codereviewerai or @codereviewer mention in GitHub PR comments
  * Responds with context-aware AI response directly on the PR
+ * Supports re-review requests when user asks to "review" or "re-review" the changes
  */
 export const handlePRMention = inngest.createFunction(
   {
@@ -25,6 +54,33 @@ export const handlePRMention = inngest.createFunction(
   async ({ event, step }) => {
     const { owner, repo, prNumber, userId, query, commentUser, token, apiKey } =
       event.data;
+
+    // Check if this is a request for a full PR re-review
+    const shouldReReview = isReviewRequest(query);
+
+    if (shouldReReview) {
+      // Trigger a full PR re-review
+      await step.run("trigger-re-review", async () => {
+        // Notify user that re-review is starting
+        await replyToComment(
+          token,
+          owner,
+          repo,
+          prNumber,
+          `🔄 Starting a fresh review of the latest changes in this PR. I'll post a comprehensive review shortly...`,
+          commentUser
+        );
+
+        // Trigger the full review
+        await reviewPullRequest(owner, repo, prNumber, { apiKey });
+      });
+
+      console.log(
+        `[PR Mention] Re-review triggered for ${owner}/${repo}#${prNumber} by @${commentUser}`
+      );
+
+      return { success: true, action: "re-review" };
+    }
 
     // Fetch PR context
     const prContext = await step.run("fetch-pr-context", async () => {
@@ -130,18 +186,24 @@ Respond directly to the user's question:`;
 
     // Post response as a comment on the PR
     await step.run("post-response", async () => {
-      // Add citations if issues were used
+      // Add citations if issues were used, now with links
       let finalResponse = response;
 
       if (context.issues.length > 0) {
         const citations = context.issues
           .slice(0, 3)
-          .map(
-            (ctx) =>
-              `- [${ctx.issue.source.toUpperCase()}] ${ctx.issue.externalId}: ${
-                ctx.issue.title
-              }`
-          )
+          .map((ctx) => {
+            const source = ctx.issue.source.toUpperCase();
+            const id = ctx.issue.externalId;
+            const title = ctx.issue.title;
+            const url = ctx.issue.sourceUrl;
+
+            // If URL is available, make the ID a clickable link
+            if (url) {
+              return `- [${source}] [${id}](${url}): ${title}`;
+            }
+            return `- [${source}] ${id}: ${title}`;
+          })
           .join("\n");
 
         finalResponse += `\n\n<details>\n<summary>📋 Related Issues</summary>\n\n${citations}\n</details>`;
@@ -161,6 +223,6 @@ Respond directly to the user's question:`;
       `[PR Mention] Responded to @codereviewerai mention in ${owner}/${repo}#${prNumber}`
     );
 
-    return { success: true };
+    return { success: true, action: "question-response" };
   }
 );
