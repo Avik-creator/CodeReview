@@ -4,6 +4,10 @@ import {
   postReviewComment,
 } from "@/components/github/lib/gitHub";
 import { retrieveContext } from "@/components/ai/lib/rag";
+import {
+  retrieveIssueContext,
+  buildIssueContextPrompt,
+} from "@/components/ai/lib/issueContext";
 import prisma from "@/lib/db";
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
@@ -52,7 +56,29 @@ export const generateReview = inngest.createFunction(
         );
       }
       const query = `${PrTitle}\n${description}`;
-      return retrieveContext(query, `${owner}/${repo}`, apiKey);
+
+      // Retrieve code context
+      const codeContext = await retrieveContext(
+        query,
+        `${owner}/${repo}`,
+        apiKey
+      );
+
+      // Retrieve issue context from Linear/Jira
+      const issueContext = await retrieveIssueContext(
+        {
+          query,
+          userId,
+          topK: 5,
+        },
+        apiKey
+      );
+
+      return {
+        code: codeContext,
+        issues: issueContext,
+        issuePrompt: buildIssueContextPrompt(issueContext),
+      };
     });
     const review = await step.run("generate-ai-review", async () => {
       const { apiKey, goodRules, badRules } = event.data as {
@@ -91,7 +117,9 @@ PR Title: ${title}
 PR Description: ${description || "No description provided"}
 
 Context from Codebase:
-${context.join("\n\n")}
+${context.code.join("\n\n")}
+
+${context.issuePrompt}
 
 Code Changes:
 \`\`\`diff
@@ -101,11 +129,12 @@ ${rulesPrompt}
 
 Please provide:
 1. **Walkthrough**: A file-by-file explanation of the changes.
-2. **Sequence Diagram**: A Mermaid JS sequence diagram visualizing the flow of the changes (if applicable). Use \`\`\`mermaid ... \`\`\` block. **IMPORTANT**: Ensure the Mermaid syntax is valid. Do not use special characters (like quotes, braces, parentheses) inside Note text or labels as it breaks rendering. Keep the diagram simple.
-3. **Summary**: Brief overview.
-4. **Strengths**: What's done well.
-5. **Issues**: Bugs, security concerns, code smells.
-6. **Suggestions**: Specific code improvements.
+2. **Related Issues**: If any issues from Linear/Jira are relevant, mention them with their IDs.
+3. **Sequence Diagram**: A Mermaid JS sequence diagram visualizing the flow of the changes (if applicable). Use \`\`\`mermaid ... \`\`\` block. **IMPORTANT**: Ensure the Mermaid syntax is valid. Do not use special characters (like quotes, braces, parentheses) inside Note text or labels as it breaks rendering. Keep the diagram simple.
+4. **Summary**: Brief overview.
+5. **Strengths**: What's done well.
+6. **Issues**: Bugs, security concerns, code smells.
+7. **Suggestions**: Specific code improvements.
 7. **Roast**: Dark Humored Code Feedback.
 
 Format your response in markdown.`;

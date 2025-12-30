@@ -3,6 +3,7 @@
 import { ProfileForm } from "@/components/dashboard/settings/profileForm";
 import { RepositoryList } from "@/components/dashboard/settings/repositoryList";
 import { AISettings } from "@/components/dashboard/settings/ai-settings";
+import { IntegrationsSettings } from "@/components/dashboard/settings/integrations";
 
 const SettingsPage = () => {
   return (
@@ -15,6 +16,7 @@ const SettingsPage = () => {
       </div>
       <ProfileForm />
       <AISettings />
+      <IntegrationsSettings />
       <RepositoryList />
     </div>
   );

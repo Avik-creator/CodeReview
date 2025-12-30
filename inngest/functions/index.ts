@@ -4,6 +4,15 @@ import { getRepoFileContents } from "@/components/github/lib/gitHub";
 import { indexCodebase } from "@/components/ai/lib/rag";
 import { decrypt } from "@/lib/encryption";
 
+// Export issue sync functions
+export { syncIssue, syncAllIssues } from "./issueSync";
+
+// Export integration sync function
+export { syncIntegrationIssues } from "./integrationSync";
+
+// Export PR mention handler
+export { handlePRMention } from "./prMention";
+
 export const indexRepo = inngest.createFunction(
   { id: "index-repo" },
   { event: "repository.connected" },

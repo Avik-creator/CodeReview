@@ -113,3 +113,72 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
+// Integration configurations for Linear, Jira, etc.
+model Integration {
+  id            String   @id @default(cuid())
+  userId        String
+  provider      String   // 'linear' | 'jira'
+  accessToken   String   // encrypted
+  refreshToken  String?  // encrypted (for OAuth)
+  expiresAt     DateTime?
+  workspaceId   String?  // Linear workspace ID or Jira cloud ID
+  workspaceName String?
+  webhookSecret String?  // for validating incoming webhooks
+  metadata      Json?    // provider-specific config (e.g., Jira project keys)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@map("integration")
+}
+
+// Normalized issues from all sources
+model Issue {
+  id            String   @id @default(cuid())
+  externalId    String   // ID from source system
+  source        String   // 'linear' | 'jira' | 'github'
+  sourceUrl     String?  // URL to the issue in the source system
+  projectKey    String?  // e.g., 'ENG', 'PROJ-1'
+  projectName   String?
+  title         String
+  description   String?  @db.Text
+  status        String?
+  priority      String?
+  assignee      String?
+  labels        String[] @default([])
+  issueType     String?  // 'bug', 'feature', 'task', etc.
+  userId        String   // Owner in our system
+  repositoryId  String?  // Link to repository if applicable
+  embedded      Boolean  @default(false) // Whether embeddings exist
+  embeddedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sourceCreatedAt DateTime?
+  sourceUpdatedAt DateTime?
+
+  @@unique([source, externalId, userId])
+  @@index([userId])
+  @@index([source])
+  @@index([projectKey])
+  @@index([status])
+  @@map("issue")
+}
+
+// AI model mentions/conversations
+model AiConversation {
+  id            String   @id @default(cuid())
+  userId        String
+  repositoryId  String?
+  reviewId      String?
+  model         String   // e.g., 'gemini-2.5-flash'
+  messages      Json     // Array of {role, content, timestamp}
+  context       Json?    // Retrieved context metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([repositoryId])
+  @@map("ai_conversation")
+}
