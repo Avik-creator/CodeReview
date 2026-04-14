@@ -183,7 +183,7 @@ export default function ReviewsPage() {
               repositories and start reviewing pull requests to see them here.
             </p>
             <Button asChild>
-              <Link href="/dashboard/repositories">Connect Repositories</Link>
+              <Link href="/dashboard/repository">Connect Repositories</Link>
             </Button>
           </CardContent>
         </Card>
