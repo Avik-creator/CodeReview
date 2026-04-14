@@ -1,6 +1,6 @@
 # CodeReviewer
 
-![OG_IMAGE](https://codereviewer.avikmukherjee.me/og-image.webp)
+![OG_IMAGE](https://codereviewer.avikmukherjee.com/og-image.webp)
 
 Having trouble getting your PR reviewed? Worry not! **CodeReviewer** is here to save the day. An intelligent code review platform powered by AI that provides comprehensive feedback on pull requests.
 
@@ -129,7 +129,7 @@ The application includes Open Graph metadata for better social media sharing. Th
 openGraph: {
   title: "CodeReviewer",
   description: "Having Trouble Getting your PR reviewed, worry not! CodeReviewer is here to save the day.",
-  url: "https://codereviewer.avikmukherjee.me",
+  url: "https://codereviewer.avikmukherjee.com",
   siteName: "Avik Mukherjee's Portfolio",
   images: [
     {
@@ -196,7 +196,7 @@ This project is private and proprietary.
 
 ## 👤 Author
 
-Created by [Avik Mukherjee](https://avikmukherjee.me)
+Created by [Avik Mukherjee](https://avikmukherjee.com)
 
 ---
 

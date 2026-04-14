@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     title: "CodeReviewer",
     description:
       "Having Trouble Getting your PR reviewed, worry not! CodeReviewer is here to save the day.",
-    url: "https://codereviewer.avikmukherjee.me",
+    url: "https://codereviewer.avikmukherjee.com",
     siteName: "CodeReviewer",
     images: [
       {
